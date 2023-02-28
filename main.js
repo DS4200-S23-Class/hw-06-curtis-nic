@@ -28,7 +28,7 @@ async function buildScatterPlot(
   const X_SCALE = d3
     .scaleLinear() // linear scale because we have
     // linear data
-    .domain([0, MAX_X + 1]) // add some padding
+    .domain([0, MAX_X]) // add some padding
     .range([0, VIS_WIDTH]);
 
   const MAX_Y = d3.max(data, (d) => Number(d[y_attribute]));
@@ -36,7 +36,7 @@ async function buildScatterPlot(
   const Y_SCALE = d3
     .scaleLinear() // linear scale because we have
     // linear data
-    .domain([0, MAX_Y + 1]) // add some padding
+    .domain([0, MAX_Y]) // add some padding
     .range([VIS_HEIGHT, 0]);
 
   FRAME.selectAll('points')
@@ -142,5 +142,7 @@ function renderSpecies(flower) {
 }
 
 buildScatterPlot('#vis1', 'data/iris.csv', 'Petal_Length', 'Sepal_Length', renderSpecies);
+buildScatterPlot('#vis2', 'data/iris.csv', 'Petal_Width', 'Sepal_Width', renderSpecies);
+
 //buildScatterPlot('#vis2', 'data/iris.csv', 'Petal_Width', 'Sepal_Width');
 // buildBarChart();
