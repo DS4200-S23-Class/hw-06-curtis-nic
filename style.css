@@ -13,3 +13,16 @@ body {
 .col {
     flex: 33%;
 }
+
+
+.setosa {
+    fill: blue;
+}
+
+.versicolor {
+    fill: red;
+}
+
+.virginica {
+    fill: green;
+}
