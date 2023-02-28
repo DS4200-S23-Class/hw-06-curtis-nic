@@ -89,7 +89,6 @@ function onPointClick(circleElement) {
 
 async function buildBarChart() {
   const dataBar = await d3.csv('data/bar-data.csv');
-  console.log(dataBar);
 
   const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
   const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
@@ -109,7 +108,6 @@ async function buildBarChart() {
     .range([0, VIS_WIDTH]);
 
   const MAX_Y = d3.max(dataBar, (d) => Number(d.amount));
-  console.log(MAX_Y);
 
   const Y_SCALE = d3
     .scaleLinear()
@@ -137,11 +135,12 @@ async function buildBarChart() {
     .call(d3.axisLeft(Y_SCALE).ticks(4));
 }
 
+// add a class to the point representing a visual distinction in the
+// species of the flower
 function renderSpecies(flower) {
-  console.log(flower);
   return flower.Species;
 }
 
 buildScatterPlot('#vis1', 'data/iris.csv', 'Petal_Length', 'Sepal_Length', renderSpecies);
 //buildScatterPlot('#vis2', 'data/iris.csv', 'Petal_Width', 'Sepal_Width');
-//buildBarChart();
+// buildBarChart();
