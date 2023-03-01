@@ -18,8 +18,12 @@ body {
     fill-opacity: 0.5;
 }
 
+.bar {
+    fill-opacity: 0.5;
+}
+
 .selected {
-    opacity: 1 !important;
+    fill-opacity: 1 !important;
     stroke: black;
     stroke-width: 1px;
 }

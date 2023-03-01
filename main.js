@@ -41,7 +41,7 @@ async function buildScatterPlot(
     .domain([0, MAX_Y]) // add some padding
     .range([VIS_HEIGHT, 0]);
 
-  const points = FRAME.append('g')
+  FRAME.append('g')
     .selectAll('circle')
     .data(data)
     .enter()
@@ -83,12 +83,13 @@ async function buildScatterPlot(
     // Function that is triggered when brushing is performed
     function updateChart(event) {
       const extent = event.selection;
-
       const circles = d3.selectAll('circle');
 
       circles.classed('selected', function (d) {
         return isBrushed(extent, X_SCALE(d[x_attribute]), Y_SCALE(d[y_attribute]));
       });
+
+      updateContext();
     }
 
     // A function that return TRUE or FALSE according if a dot is in the selection or not
@@ -142,7 +143,7 @@ async function buildBarChart(
     .enter()
     .append('rect')
     .attr('class', (d) => renderBar(d))
-    .attr('id', 'bar')
+    .attr('id', (d) => d[x_attribute])
     .attr('x', (d) => X_SCALE(d[x_attribute]) + MARGINS.left)
     .attr('y', (d) => Y_SCALE(d[y_attribute]) + MARGINS.top)
     .attr('width', X_SCALE.bandwidth())
@@ -195,5 +196,17 @@ buildBarChart(
   'Count of Species',
   'Species',
   'Count',
-  renderSpecies
+  (flower) => `bar ${renderSpecies(flower)}`
 );
+
+function updateContext() {
+  ['setosa', 'versicolor', 'virginica'].forEach((species) => {
+    d3.select(`#${species}`).classed('selected', isSelected(`.${species}`));
+  });
+}
+
+function isSelected(className) {
+  const circles = d3.selectAll('circle');
+
+  return circles.filter(className).filter('.selected')._groups[0].length > 0;
+}
