@@ -95,15 +95,6 @@ async function buildScatterPlot(
         y1 = brush_coords[1][1] - MARGINS.top;
       return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
     }
-
-    function in_rect(d) {
-      return (
-        X_SCALE2(d.Sepal_Width) + MARGINS.left >= brush_range[0][0] &&
-        X_SCALE2(d.Sepal_Width) + MARGINS.left <= brush_range[1][0] &&
-        Y_SCALE2(d.Petal_Width) + MARGINS.left >= brush_range[0][1] &&
-        Y_SCALE2(d.Petal_Width) + MARGINS.left <= brush_range[1][1]
-      );
-    }
   }
 }
 
