@@ -11,6 +11,7 @@ async function buildScatterPlot(
   x_attribute,
   y_attribute,
   renderPoint = () => 'point',
+  renderId = () => 'point',
   showBrush = false
 ) {
   const data = await d3.csv(filepath);
@@ -45,7 +46,7 @@ async function buildScatterPlot(
     .data(data)
     .enter()
     .append('circle')
-    .attr('id', (d) => `(${d[x_attribute]}, ${d[y_attribute]})`)
+    .attr('id', (d) => (renderId ? renderId(d) : `(${d[x_attribute]}, ${d[y_attribute]})`))
     .attr('cx', (d) => X_SCALE(d[x_attribute]) + MARGINS.left)
     .attr('cy', (d) => Y_SCALE(d[y_attribute]) + MARGINS.top)
     .attr('r', 5)
@@ -82,7 +83,10 @@ async function buildScatterPlot(
     // Function that is triggered when brushing is performed
     function updateChart(event) {
       const extent = event.selection;
-      points.classed('selected', function (d) {
+
+      const circles = d3.selectAll('circle');
+
+      circles.classed('selected', function (d) {
         return isBrushed(extent, X_SCALE(d[x_attribute]), Y_SCALE(d[y_attribute]));
       });
     }
@@ -172,7 +176,8 @@ buildScatterPlot(
   'Pental_Length vs Sepal_Length',
   'Petal_Length',
   'Sepal_Length',
-  (d) => `point ${renderSpecies(d)}`
+  (d) => `point ${renderSpecies(d)}`,
+  (d) => d.id
 );
 buildScatterPlot(
   '#vis2',
@@ -181,7 +186,8 @@ buildScatterPlot(
   'Petal_Width',
   'Sepal_Width',
   (d) => `point ${renderSpecies(d)}`,
-  (showBrush = true)
+  (d) => d.id,
+  true
 );
 buildBarChart(
   '#vis3',
