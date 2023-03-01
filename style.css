@@ -39,3 +39,9 @@ body {
 .virginica {
     fill: green;
 }
+
+.title {
+    font-size: 20px;
+    text-anchor: middle;
+    font-weight: bold;
+}

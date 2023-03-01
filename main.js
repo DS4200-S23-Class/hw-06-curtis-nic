@@ -65,8 +65,7 @@ async function buildScatterPlot(
   FRAME.append('text')
     .attr('x', VIS_WIDTH / 2 + MARGINS.left / 2)
     .attr('y', MARGINS.top / 2)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '20px')
+    .attr('class', 'title')
     .text(title);
 
   if (showBrush) {
@@ -160,8 +159,7 @@ async function buildBarChart(
   FRAME.append('text')
     .attr('x', VIS_WIDTH / 2 + MARGINS.left / 2)
     .attr('y', MARGINS.top / 2)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '20px')
+    .attr('class', 'title')
     .text(title);
 }
 
