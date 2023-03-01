@@ -40,7 +40,8 @@ async function buildScatterPlot(
     .domain([0, MAX_Y]) // add some padding
     .range([VIS_HEIGHT, 0]);
 
-  const points = FRAME.selectAll('points')
+  const points = FRAME.append('g')
+    .selectAll('circle')
     .data(data)
     .enter()
     .append('circle')
@@ -73,15 +74,14 @@ async function buildScatterPlot(
         .brush() // Add the brush feature using the d3.brush function
         .extent([
           [0, 0],
-          [VIS_WIDTH, VIS_HEIGHT],
+          [FRAME_WIDTH, FRAME_HEIGHT],
         ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
         .on('start brush', updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
     );
 
     // Function that is triggered when brushing is performed
-    function updateChart() {
-      console.log(d3);
-      const extent = d3.event.selection;
+    function updateChart(event) {
+      const extent = event.selection;
       points.classed('selected', function (d) {
         return isBrushed(extent, X_SCALE(d[x_attribute]), Y_SCALE(d[y_attribute]));
       });
@@ -89,49 +89,22 @@ async function buildScatterPlot(
 
     // A function that return TRUE or FALSE according if a dot is in the selection or not
     function isBrushed(brush_coords, cx, cy) {
-      console.log({ brush_coords, cx, cy });
-      const x0 = brush_coords[0][0],
-        x1 = brush_coords[1][0],
-        y0 = brush_coords[0][1],
-        y1 = brush_coords[1][1];
+      const x0 = brush_coords[0][0] - MARGINS.left,
+        x1 = brush_coords[1][0] - MARGINS.top,
+        y0 = brush_coords[0][1] - MARGINS.left,
+        y1 = brush_coords[1][1] - MARGINS.top;
       return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
     }
+
+    function in_rect(d) {
+      return (
+        X_SCALE2(d.Sepal_Width) + MARGINS.left >= brush_range[0][0] &&
+        X_SCALE2(d.Sepal_Width) + MARGINS.left <= brush_range[1][0] &&
+        Y_SCALE2(d.Petal_Width) + MARGINS.left >= brush_range[0][1] &&
+        Y_SCALE2(d.Petal_Width) + MARGINS.left <= brush_range[1][1]
+      );
+    }
   }
-
-  // FRAME.call(
-  //   d3
-  //     .brush()
-  //     .extent([
-  //       [MARGINS.left, MARGINS.bottom],
-  //       [VIS_WIDTH + MARGINS.left, VIS_HEIGHT + MARGINS.top],
-  //     ])
-  //     .on('start brush', brushChart)
-  // );
-
-  // const myCircle1 = d3.selectAll('.eachpoint1');
-  // const myCircle2 = d3.selectAll('.eachpoint2');
-  // const myBar = d3.selectAll('.bar');
-
-  // function updateChart(event) {
-  //   extent = event.selection;
-  //   myCircle1.classed('selected', function (d) {
-  //     return isBrushed(
-  //       extent,
-  //       X_SCALE2(d.Sepal_Width) + MARGINS.left,
-  //       Y_SCALE2(d.Petal_Width) + MARGINS.top
-  //     );
-  //   });
-  //   myCircle2.classed('selected', function (d) {
-  //     return isBrushed(
-  //       extent,
-  //       X_SCALE2(d.Sepal_Width) + MARGINS.left,
-  //       Y_SCALE2(d.Petal_Width) + MARGINS.top
-  //     );
-  //   });
-  //   myBar.classed('selected', function (d) {
-  //     return barBrushed(extent, d);
-  //   });
-  // }
 }
 
 async function buildBarChart(
