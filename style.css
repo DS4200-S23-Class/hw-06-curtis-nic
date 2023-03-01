@@ -24,7 +24,7 @@ body {
 
 .selected {
     fill-opacity: 1 !important;
-    stroke: black;
+    stroke: orange;
     stroke-width: 1px;
 }
 
