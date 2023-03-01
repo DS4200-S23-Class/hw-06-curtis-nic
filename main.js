@@ -1,6 +1,8 @@
 const FRAME_HEIGHT = 500;
 const FRAME_WIDTH = 500;
 const MARGINS = { left: 50, right: 50, top: 50, bottom: 50 };
+const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
+const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 
 async function buildScatterPlot(
   id,
@@ -8,12 +10,10 @@ async function buildScatterPlot(
   title,
   x_attribute,
   y_attribute,
-  renderPoint = () => 'point'
+  renderPoint = () => 'point',
+  showBrush = false
 ) {
   const data = await d3.csv(filepath);
-
-  const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
-  const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 
   const FRAME = d3
     .select(id)
@@ -40,7 +40,7 @@ async function buildScatterPlot(
     .domain([0, MAX_Y]) // add some padding
     .range([VIS_HEIGHT, 0]);
 
-  FRAME.selectAll('points')
+  const points = FRAME.selectAll('points')
     .data(data)
     .enter()
     .append('circle')
@@ -48,8 +48,7 @@ async function buildScatterPlot(
     .attr('cx', (d) => X_SCALE(d[x_attribute]) + MARGINS.left)
     .attr('cy', (d) => Y_SCALE(d[y_attribute]) + MARGINS.top)
     .attr('r', 5)
-    .attr('class', (d) => renderPoint(d))
-    .attr('onclick', 'onPointClick(this)');
+    .attr('class', (d) => renderPoint(d));
 
   FRAME.append('g') // g is a "placeholder" svg
     .attr('transform', 'translate(' + MARGINS.left + ',' + (VIS_HEIGHT + MARGINS.top) + ')')
@@ -68,66 +67,71 @@ async function buildScatterPlot(
     .style('font-size', '20px')
     .text(title);
 
-  FRAME.call(
-    d3
-      .brush()
-      .extent([
-        [MARGINS.left, MARGINS.bottom],
-        [VIS_WIDTH + MARGINS.left, VIS_HEIGHT + MARGINS.top],
-      ])
-      .on('start brush', brushChart)
-  );
+  if (showBrush) {
+    FRAME.call(
+      d3
+        .brush() // Add the brush feature using the d3.brush function
+        .extent([
+          [0, 0],
+          [VIS_WIDTH, VIS_HEIGHT],
+        ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+        .on('start brush', updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
+    );
 
-  const myCircle1 = d3.selectAll('.eachpoint1');
-  const myCircle2 = d3.selectAll('.eachpoint2');
-  const myBar = d3.selectAll('.bar');
+    // Function that is triggered when brushing is performed
+    function updateChart() {
+      console.log(d3);
+      const extent = d3.event.selection;
+      points.classed('selected', function (d) {
+        return isBrushed(extent, X_SCALE(d[x_attribute]), Y_SCALE(d[y_attribute]));
+      });
+    }
 
-  function updateChart(event) {
-    extent = event.selection;
-    myCircle1.classed('selected', function (d) {
-      return isBrushed(
-        extent,
-        X_SCALE2(d.Sepal_Width) + MARGINS.left,
-        Y_SCALE2(d.Petal_Width) + MARGINS.top
-      );
-    });
-    myCircle2.classed('selected', function (d) {
-      return isBrushed(
-        extent,
-        X_SCALE2(d.Sepal_Width) + MARGINS.left,
-        Y_SCALE2(d.Petal_Width) + MARGINS.top
-      );
-    });
-    myBar.classed('selected', function (d) {
-      return barBrushed(extent, d);
-    });
-  }
-}
-
-// translate SVG coordinates into grid coordinates
-function getGridCoordinates(circleElement, height, scalar = 1) {
-  const xCoordinate = circleElement.cx.baseVal.value / scalar;
-  const yCoordinate = (height - circleElement.cy.baseVal.value) / scalar;
-
-  return { xCoordinate, yCoordinate };
-}
-
-// add a border to a point if the point is clicked
-// if the point already has a border, remove it
-// update the coordinates on display
-// assumes grid is a square
-function onPointClick(circleElement) {
-  const coordinateDisplay = document.getElementById('coordinates');
-
-  coordinateDisplay.innerHTML = circleElement.id;
-
-  // if border already exists remove it
-  if (circleElement.classList.contains('border')) {
-    circleElement.classList.remove('border');
-    return;
+    // A function that return TRUE or FALSE according if a dot is in the selection or not
+    function isBrushed(brush_coords, cx, cy) {
+      console.log({ brush_coords, cx, cy });
+      const x0 = brush_coords[0][0],
+        x1 = brush_coords[1][0],
+        y0 = brush_coords[0][1],
+        y1 = brush_coords[1][1];
+      return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
+    }
   }
 
-  circleElement.classList.add('border');
+  // FRAME.call(
+  //   d3
+  //     .brush()
+  //     .extent([
+  //       [MARGINS.left, MARGINS.bottom],
+  //       [VIS_WIDTH + MARGINS.left, VIS_HEIGHT + MARGINS.top],
+  //     ])
+  //     .on('start brush', brushChart)
+  // );
+
+  // const myCircle1 = d3.selectAll('.eachpoint1');
+  // const myCircle2 = d3.selectAll('.eachpoint2');
+  // const myBar = d3.selectAll('.bar');
+
+  // function updateChart(event) {
+  //   extent = event.selection;
+  //   myCircle1.classed('selected', function (d) {
+  //     return isBrushed(
+  //       extent,
+  //       X_SCALE2(d.Sepal_Width) + MARGINS.left,
+  //       Y_SCALE2(d.Petal_Width) + MARGINS.top
+  //     );
+  //   });
+  //   myCircle2.classed('selected', function (d) {
+  //     return isBrushed(
+  //       extent,
+  //       X_SCALE2(d.Sepal_Width) + MARGINS.left,
+  //       Y_SCALE2(d.Petal_Width) + MARGINS.top
+  //     );
+  //   });
+  //   myBar.classed('selected', function (d) {
+  //     return barBrushed(extent, d);
+  //   });
+  // }
 }
 
 async function buildBarChart(
@@ -170,7 +174,7 @@ async function buildBarChart(
     .enter()
     .append('rect')
     .attr('class', (d) => renderBar(d))
-    .attr('id', (d) => `${d[x_attribute]}: ${d[y_attribute]}`)
+    .attr('id', 'bar')
     .attr('x', (d) => X_SCALE(d[x_attribute]) + MARGINS.left)
     .attr('y', (d) => Y_SCALE(d[y_attribute]) + MARGINS.top)
     .attr('width', X_SCALE.bandwidth())
@@ -212,7 +216,8 @@ buildScatterPlot(
   'Petal_Width vs Sepal_Width',
   'Petal_Width',
   'Sepal_Width',
-  (d) => `point ${renderSpecies(d)}`
+  (d) => `point ${renderSpecies(d)}`,
+  (showBrush = true)
 );
 buildBarChart(
   '#vis3',
