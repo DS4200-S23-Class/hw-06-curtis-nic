@@ -204,7 +204,7 @@ buildScatterPlot(
   'Pental_Length vs Sepal_Length',
   'Petal_Length',
   'Sepal_Length',
-  renderSpecies
+  (d) => `point ${renderSpecies(d)}`
 );
 buildScatterPlot(
   '#vis2',
@@ -212,7 +212,7 @@ buildScatterPlot(
   'Petal_Width vs Sepal_Width',
   'Petal_Width',
   'Sepal_Width',
-  renderSpecies
+  (d) => `point ${renderSpecies(d)}`
 );
 buildBarChart(
   '#vis3',
