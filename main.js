@@ -5,6 +5,7 @@ const MARGINS = { left: 50, right: 50, top: 50, bottom: 50 };
 async function buildScatterPlot(
   id,
   filepath,
+  title,
   x_attribute,
   y_attribute,
   renderPoint = () => 'point'
@@ -59,6 +60,13 @@ async function buildScatterPlot(
     .attr('transform', 'translate(' + MARGINS.top + ',' + MARGINS.left + ')')
     .call(d3.axisLeft(Y_SCALE).ticks(4))
     .attr('font-size', '20px');
+
+  FRAME.append('text')
+    .attr('x', VIS_WIDTH / 2 + MARGINS.left / 2)
+    .attr('y', MARGINS.top / 2)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '20px')
+    .text(title);
 
   FRAME.call(
     d3
@@ -122,7 +130,14 @@ function onPointClick(circleElement) {
   circleElement.classList.add('border');
 }
 
-async function buildBarChart(id, filepath, x_attribute, y_attribute, renderBar = () => 'bar') {
+async function buildBarChart(
+  id,
+  filepath,
+  title,
+  x_attribute,
+  y_attribute,
+  renderBar = () => 'bar'
+) {
   const dataBar = await d3.csv(filepath);
 
   const VIS_HEIGHT = FRAME_HEIGHT - MARGINS.top - MARGINS.bottom;
@@ -168,6 +183,13 @@ async function buildBarChart(id, filepath, x_attribute, y_attribute, renderBar =
   FRAME.append('g')
     .attr('transform', 'translate(' + MARGINS.top + ',' + MARGINS.left + ')')
     .call(d3.axisLeft(Y_SCALE).ticks(4));
+
+  FRAME.append('text')
+    .attr('x', VIS_WIDTH / 2 + MARGINS.left / 2)
+    .attr('y', MARGINS.top / 2)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '20px')
+    .text(title);
 }
 
 // add a class to the point representing a visual distinction in the
@@ -176,6 +198,27 @@ function renderSpecies(flower) {
   return flower.Species;
 }
 
-buildScatterPlot('#vis1', 'data/iris.csv', 'Petal_Length', 'Sepal_Length', renderSpecies);
-buildScatterPlot('#vis2', 'data/iris.csv', 'Petal_Width', 'Sepal_Width', renderSpecies);
-buildBarChart('#vis3', 'data/iris_count.csv', 'Species', 'Count', renderSpecies);
+buildScatterPlot(
+  '#vis1',
+  'data/iris.csv',
+  'Pental_Length vs Sepal_Length',
+  'Petal_Length',
+  'Sepal_Length',
+  renderSpecies
+);
+buildScatterPlot(
+  '#vis2',
+  'data/iris.csv',
+  'Petal_Width vs Sepal_Width',
+  'Petal_Width',
+  'Sepal_Width',
+  renderSpecies
+);
+buildBarChart(
+  '#vis3',
+  'data/iris_count.csv',
+  'Count of Species',
+  'Species',
+  'Count',
+  renderSpecies
+);
