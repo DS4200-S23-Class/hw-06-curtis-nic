@@ -80,7 +80,7 @@ async function buildScatterPlot(
         .on('start brush', updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
     );
 
-    // Function that is triggered when brushing is performed
+    // called on each brush update
     function updateChart(event) {
       const extent = event.selection;
       const circles = d3.selectAll('circle');
@@ -92,7 +92,7 @@ async function buildScatterPlot(
       updateContext();
     }
 
-    // A function that return TRUE or FALSE according if a dot is in the selection or not
+    // determine whether a particular point is brushed
     function isBrushed(brush_coords, cx, cy) {
       const x0 = brush_coords[0][0] - MARGINS.left,
         x1 = brush_coords[1][0] - MARGINS.top,
@@ -199,12 +199,14 @@ buildBarChart(
   (flower) => `bar ${renderSpecies(flower)}`
 );
 
+// called on each brush render
 function updateContext() {
   ['setosa', 'versicolor', 'virginica'].forEach((species) => {
     d3.select(`#${species}`).classed('selected', isSelected(`.${species}`));
   });
 }
 
+// determine whether a particular class is selected
 function isSelected(className) {
   const circles = d3.selectAll('circle');
 
